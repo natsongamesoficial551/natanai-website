@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natan AI - Neural Interface</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-cyan: #00ffff;
+      --neon-pink: #ff006e;
+      --neon-green: #39ff14;
+      --dark-bg: #0a0a0a;
+      --panel-bg: #111111;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(0, 255, 255, 0.2);
+      --text: #ffffff;
+      --text-dim: #888888;
+      --error: #ff4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Cyberpunk Grid Background */
+    .cyber-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(255, 0, 110, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 110, 0.02) 1px, transparent 1px);
+      background-size: 100px 100px, 100px 100px, 25px 25px, 25px 25px;
+      z-index: -2;
+      animation: gridFlow 20s linear infinite;
+    }
+
+    /* Neural Network Particles */
+    .neural-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 60% 80%, rgba(57, 255, 20, 0.1) 0%, transparent 50%);
+      animation: neuralPulse 8s ease-in-out infinite;
+    }
+
+    /* LOGIN SCREEN STYLES */
+    .login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .login-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 60px 50px;
+      min-width: 450px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-green));
+      animation: scanline 2s linear infinite;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-green));
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: logoGlow 3s ease-in-out infinite;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 15px;
+    }
+
+    .login-subtitle {
+      color: var(--text-dim);
+      font-size: 1rem;
+      font-weight: 300;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 15px 20px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .login-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .btn-login, .btn-register {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login {
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+      color: var(--text);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-register {
+      background: transparent;
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+    }
+
+    .btn-register:hover {
+      background: var(--neon-green);
+      color: var(--dark-bg);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(57, 255, 20, 0.3);
+    }
+
+    .login-toggle {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--text-dim);
+    }
+
+    .login-toggle button {
+      background: none;
+      border: none;
+      color: var(--neon-cyan);
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+      font-size: inherit;
+      transition: color 0.3s ease;
+    }
+
+    .login-toggle button:hover {
+      color: var(--neon-pink);
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--error);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--error);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 15px;
+      animation: errorShake 0.5s ease;
+    }
+
+    .success-message {
+      background: rgba(57, 255, 20, 0.1);
+      border: 1px solid var(--neon-green);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--neon-green);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 15px;
+      animation: successPulse 0.5s ease;
+    }
+
+    /* MAIN APPLICATION STYLES */
+    .app-container {
+      display: none;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    /* Header Navigation */
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-green));
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: logoGlow 3s ease-in-out infinite;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 16px;
+    }
+
+    .user-avatar {
+      width: 35px;
+      height: 35px;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .user-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--neon-cyan);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 8px 16px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: var(--error);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--glass);
+      border: 1px solid var(--neon-green);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    /* Dashboard Grid */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 200px 1fr;
+      gap: 30px;
+      flex: 1;
+    }
+
+    /* System Card */
+    .system-card {
+      grid-column: span 2;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+      animation: scanline 2s linear infinite;
+    }
+
+    .system-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .system-desc {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .system-specs {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .spec-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--neon-green);
+    }
+
+    /* Chat Trigger Button */
+    .chat-trigger {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-trigger::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, var(--neon-pink), transparent);
+      animation: rotate 4s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .chat-trigger:hover::before {
+      opacity: 0.1;
+    }
+
+    .chat-trigger:hover {
+      border-color: var(--neon-pink);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(255, 0, 110, 0.2);
+    }
+
+    .chat-icon {
+      font-size: 3rem;
+      color: var(--neon-pink);
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .chat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    /* Features Panel */
+    .features-panel {
+      grid-column: span 3;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 40px;
+      position: relative;
+    }
+
+    .features-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .feature-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .feature-box:hover {
+      border-color: var(--neon-green);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(57, 255, 20, 0.1);
+    }
+
+    .feature-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--neon-green);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-box:hover::before {
+      opacity: 1;
+    }
+
+    .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      color: var(--neon-green);
+    }
+
+    .feature-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .feature-desc {
+      color: var(--text-dim);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    /* Chat Modal */
+    .chat-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 1400px;
+      height: 90vh;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Chat Sidebar */
+    .chat-sidebar {
+      width: 300px;
+      background: rgba(0, 0, 0, 0.5);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 25px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .close-chat {
+      background: none;
+      border: none;
+      color: var(--neon-pink);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-left: auto;
+    }
+
+    .close-chat:hover {
+      transform: scale(1.2);
+      color: var(--text);
+    }
+
+    .sidebar-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+    }
+
+    .new-chat-btn {
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      margin: 20px;
+    }
+
+    .new-chat-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .chat-item {
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chat-item:hover {
+      border-color: var(--neon-green);
+      background: rgba(57, 255, 20, 0.05);
+    }
+
+    .chat-item.active {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    .chat-preview {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .chat-time {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Chat Main Area */
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 25px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .ai-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      animation: avatarGlow 3s ease-in-out infinite;
+    }
+
+    .chat-info h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--neon-cyan);
+    }
+
+    .chat-info p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--neon-cyan), var(--neon-pink));
+      border-radius: 10px;
+    }
+
+    .welcome-interface {
+      text-align: center;
+      padding: 60px 40px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .welcome-logo {
+      font-size: 4rem;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+
+    .welcome-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .welcome-desc {
+      color: var(--text-dim);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .message {
+      margin-bottom: 25px;
+      animation: messageAppear 0.4s ease;
+    }
+
+    .user-message {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .ai-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-green));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 18px 22px;
+      border-radius: 15px;
+      font-size: 1rem;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .user-bubble {
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+      color: var(--text);
+      border-bottom-right-radius: 5px;
+    }
+
+    .ai-bubble {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 5px;
+    }
+
+    .chat-input-area {
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid var(--border);
+    }
+
+    .input-container {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      padding: 5px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 15px 25px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .send-button {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(45deg, var(--neon-pink), var(--neon-green));
+      border: none;
+      border-radius: 50%;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .send-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(255, 0, 110, 0.4);
+    }
+
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 18px 22px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      border-bottom-left-radius: 5px;
+      max-width: 80px;
+      margin-bottom: 25px;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    /* Animations */
+    @keyframes gridFlow {
+      0% { transform: translateY(0) translateX(0); }
+      100% { transform: translateY(-100px) translateX(-100px); }
+    }
+
+    @keyframes neuralPulse {
+      0%, 100% { opacity: 0.8; filter: hue-rotate(0deg); }
+      50% { opacity: 1; filter: hue-rotate(90deg); }
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes scanline {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes avatarGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    @keyframes messageAppear {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-12px); }
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .dashboard {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 200px 200px 1fr;
+      }
+      
+      .system-card {
+        grid-column: span 1;
+      }
+      
+      .features-panel {
+        grid-column: span 2;
+      }
+      
+      .login-container {
+        min-width: 350px;
+        padding: 40px 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      
+      .system-card,
+      .features-panel {
+        grid-column: span 1;
+      }
+      
+      .chat-container {
+        flex-direction: column;
+        height: 95vh;
+      }
+      
+      .chat-sidebar {
+        width: 100%;
+        max-height: 200px;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+      
+      .system-specs {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+
+      .login-container {
+        min-width: 300px;
+        padding: 30px 20px;
+      }
+
+      .nav-controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cyber-grid"></div>
+  <div class="neural-bg"></div>
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">Natan AI</div>
+        <p class="login-subtitle">Sistema Neural de Autenticação</p>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="username">Usuário</label>
+          <input type="text" id="username" class="form-input" placeholder="Digite seu nome de usuário" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Senha</label>
+          <input type="password" id="password" class="form-input" placeholder="Digite sua senha" required>
+        </div>
+
+        <div class="login-buttons">
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Acessar Sistema
+          </button>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM (HIDDEN) -->
+      <form class="login-form" id="registerForm" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="newUsername">Novo Usuário</label>
+          <input type="text" id="newUsername" class="form-input" placeholder="Escolha um nome de usuário" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="newPassword">Nova Senha</label>
+          <input type="password" id="newPassword" class="form-input" placeholder="Crie uma senha segura" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirmar Senha</label>
+          <input type="password" id="confirmPassword" class="form-input" placeholder="Confirme sua senha" required>
+        </div>
+
+        <div class="login-buttons">
+          <button type="submit" class="btn-register">
+            <i class="fas fa-user-plus"></i> Criar Conta
+          </button>
+        </div>
+      </form>
+
+      <div class="login-toggle">
+        <span id="toggleText">Não tem uma conta?</span>
+        <button type="button" id="toggleBtn">Registrar-se</button>
+      </div>
+
+      <div id="messageArea"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div class="app-container" id="appContainer">
+    <div class="container">
+      <!-- Header Navigation -->
+      <nav class="nav-header">
+        <div class="logo">Natan AI</div>
+        <div class="nav-controls">
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="user-name" id="currentUser">Usuário</span>
+          </div>
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            Neural Online
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Dashboard -->
+      <div class="dashboard">
+        <!-- System Information Card -->
+        <div class="system-card">
+          <h2 class="system-title">Neural System</h2>
+          <p class="system-desc">
+            Sistema de Inteligência Artificial desenvolvido por Natan Borges. 
+            Arquitetura neural avançada para processamento de linguagem natural.
+          </p>
+          <div class="system-specs">
+            <div class="spec-item">
+              <div class="spec-label">Versão</div>
+              <div class="spec-value">v2.0-Neural</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Tecnologia</div>
+              <div class="spec-value">ML + NLP</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Status</div>
+              <div class="spec-value">ATIVO</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Trigger Button -->
+        <div class="chat-trigger" onclick="abrirChat()">
+          <div class="chat-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <div class="chat-label">Iniciar Chat</div>
+        </div>
+
+        <!-- Features Panel -->
+        <div class="features-panel">
+          <h3 class="features-title">
+            <i class="fas fa-microchip"></i>
+            Capacidades do Sistema
+          </h3>
+          <div class="features-grid">
+            <div class="feature-box">
+              <div class="feature-header">
+                <i class="fas fa-brain feature-icon"></i>
+                <h4 class="feature-name">IA Conversacional</h4>
+              </div>
+              <p class="feature-desc">
+                Processamento avançado de linguagem natural com compreensão contextual profunda
+              </p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-header">
+                <i class="fas fa-bolt feature-icon"></i>
+                <h4 class="feature-name">Resposta Instantânea</h4>
+              </div>
+              <p class="feature-desc">
+                Algoritmos otimizados para processamento e resposta em tempo real
+              </p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-header">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h4 class="feature-name">Segurança Neural</h4>
+              </div>
+              <p class="feature-desc">
+                Comunicação criptografada com proteção de dados em múltiplas camadas
+              </p>
+            </div>
+            <div class="feature-box">
+              <div class="feature-header">
+                <i class="fas fa-graduation-cap feature-icon"></i>
+                <h4 class="feature-name">Aprendizado Adaptativo</h4>
+              </div>
+              <p class="feature-desc">
+                Sistema que evolui continuamente baseado em interações e feedback
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Modal -->
+  <div class="chat-modal" id="chatModal">
+    <div class="chat-container">
+      <!-- Chat Sidebar -->
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <h3 class="sidebar-title">Conversas</h3>
+          <button class="close-chat" onclick="fecharChat()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <button class="new-chat-btn" onclick="novoChat()">
+          <i class="fas fa-plus"></i> Nova Conversa
+        </button>
+        
+        <div class="chat-list" id="chatList">
+          <!-- Chat items will be populated here -->
+        </div>
+      </div>
+
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        <div class="chat-header">
+          <div class="ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="chat-info">
+            <h3>Natan AI</h3>
+            <p>
+              <div class="status-dot"></div>
+              Sistema Neural Ativo
+            </p>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="welcome-interface">
+            <div class="welcome-logo">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h4 class="welcome-text">Interface Neural Ativa</h4>
+            <p class="welcome-desc">
+              Sistema Natan AI inicializado com sucesso. Pronto para receber comandos e estabelecer comunicação neural.
+            </p>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="input-container">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." maxlength="1000">
+            <button class="send-button" id="sendButton" onclick="enviarMensagem()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sistema de autenticação
+    let usuarioAtual = null;
+    let chats = [];
+
+    // Usuários do sistema (em produção, isso seria no backend)
+    let usuarios = JSON.parse(sessionStorage.getItem('natanAI_users') || '{}');
+
+    // Verificar se já está logado
+    function verificarLogin() {
+      const loginData = sessionStorage.getItem('natanAI_currentUser');
+      if (loginData) {
+        usuarioAtual = JSON.parse(loginData);
+        mostrarApp();
+      } else {
+        mostrarLogin();
+      }
+    }
+
+    function mostrarLogin() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('appContainer').style.display = 'none';
+    }
+
+    function mostrarApp() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContainer').style.display = 'block';
+      document.getElementById('currentUser').textContent = usuarioAtual.username;
+      
+      // Carregar chats do usuário
+      chats = JSON.parse(sessionStorage.getItem(`natanAI_chats_${usuarioAtual.username}`) || '[]');
+    }
+
+    function mostrarMensagem(tipo, texto) {
+      const messageArea = document.getElementById('messageArea');
+      messageArea.innerHTML = `<div class="${tipo}-message">${texto}</div>`;
+      
+      setTimeout(() => {
+        messageArea.innerHTML = '';
+      }, 5000);
+    }
+
+    // Sistema de Login/Registro
+    function login(username, password) {
+      // Verificar se usuário existe
+      if (!usuarios[username]) {
+        mostrarMensagem('error', 'Usuário não encontrado');
+        return false;
+      }
+
+      // Verificar senha
+      if (usuarios[username].password !== password) {
+        mostrarMensagem('error', 'Senha incorreta');
+        return false;
+      }
+
+      // Login bem-sucedido
+      usuarioAtual = {
+        username: username,
+        loginTime: new Date().toISOString()
+      };
+
+      sessionStorage.setItem('natanAI_currentUser', JSON.stringify(usuarioAtual));
+      mostrarMensagem('success', 'Login realizado com sucesso!');
+      
+      setTimeout(() => {
+        mostrarApp();
+      }, 1500);
+
+      return true;
+    }
+
+    function registrar(username, password) {
+      // Verificar se usuário já existe
+      if (usuarios[username]) {
+        mostrarMensagem('error', 'Usuário já existe');
+        return false;
+      }
+
+      // Validar dados
+      if (username.length < 3) {
+        mostrarMensagem('error', 'Usuário deve ter pelo menos 3 caracteres');
+        return false;
+      }
+
+      if (password.length < 4) {
+        mostrarMensagem('error', 'Senha deve ter pelo menos 4 caracteres');
+        return false;
+      }
+
+      // Criar usuário
+      usuarios[username] = {
+        password: password,
+        criadoEm: new Date().toISOString()
+      };
+
+      // Salvar no sessionStorage
+      sessionStorage.setItem('natanAI_users', JSON.stringify(usuarios));
+      
+      mostrarMensagem('success', 'Conta criada com sucesso!');
+      
+      // Alternar para login
+      setTimeout(() => {
+        toggleLoginRegister();
+      }, 1500);
+
+      return true;
+    }
+
+    function logout() {
+      // Salvar chats antes de sair
+      salvarChats();
+      
+      // Limpar dados da sessão
+      sessionStorage.removeItem('natanAI_currentUser');
+      usuarioAtual = null;
+      chats = [];
+      
+      // Mostrar tela de login
+      mostrarLogin();
+    }
+
+    function toggleLoginRegister() {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const toggleText = document.getElementById('toggleText');
+      const toggleBtn = document.getElementById('toggleBtn');
+
+      if (loginForm.style.display !== 'none') {
+        // Mostrar registro
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        toggleText.textContent = 'Já tem uma conta?';
+        toggleBtn.textContent = 'Fazer Login';
+      } else {
+        // Mostrar login
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        toggleText.textContent = 'Não tem uma conta?';
+        toggleBtn.textContent = 'Registrar-se';
+      }
+    }
+
+    // Sistema de gerenciamento de chats (ajustado para usuários)
+    let chatAtual = null;
+
+    function salvarChats() {
+      if (usuarioAtual) {
+        sessionStorage.setItem(`natanAI_chats_${usuarioAtual.username}`, JSON.stringify(chats));
+      }
+    }
+
+    function abrirChat() {
+      document.getElementById('chatModal').style.display = 'flex';
+      carregarListaChats();
+      if (chats.length === 0) {
+        novoChat();
+      } else {
+        selecionarChat(chats[0].id);
+      }
+      document.getElementById('chatInput').focus();
+    }
+
+    function fecharChat() {
+      document.getElementById('chatModal').style.display = 'none';
+      salvarChats();
+    }
+
+    function novoChat() {
+      const novoId = Date.now().toString();
+      const novoChat = {
+        id: novoId,
+        titulo: `Conversa ${chats.length + 1}`,
+        mensagens: [],
+        criadoEm: new Date().toLocaleString('pt-BR')
+      };
+      
+      chats.unshift(novoChat);
+      carregarListaChats();
+      selecionarChat(novoId);
+      salvarChats();
+    }
+
+    function selecionarChat(chatId) {
+      chatAtual = chats.find(c => c.id === chatId);
+      if (!chatAtual) return;
+
+      // Update sidebar selection
+      document.querySelectorAll('.chat-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      const chatElement = document.querySelector(`[data-chat-id="${chatId}"]`);
+      if (chatElement) {
+        chatElement.classList.add('active');
+      }
+
+      // Load messages
+      carregarMensagens();
+    }
+
+    function carregarListaChats() {
+      const chatList = document.getElementById('chatList');
+      chatList.innerHTML = '';
+
+      chats.forEach(chat => {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.setAttribute('data-chat-id', chat.id);
+        chatItem.onclick = () => selecionarChat(chat.id);
+        
+        const preview = chat.mensagens.length > 0 
+          ? chat.mensagens[chat.mensagens.length - 1].texto.substring(0, 50) + '...'
+          : 'Nova conversa';
+        
+        chatItem.innerHTML = `
+          <div class="chat-preview">${preview}</div>
+          <div class="chat-time">${chat.criadoEm}</div>
+        `;
+        
+        chatList.appendChild(chatItem);
+      });
+    }
+
+    function carregarMensagens() {
+      const messagesContainer = document.getElementById('chatMessages');
+      
+      if (!chatAtual || chatAtual.mensagens.length === 0) {
+        messagesContainer.innerHTML = `
+          <div class="welcome-interface">
+            <div class="welcome-logo">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h4 class="welcome-text">Interface Neural Ativa</h4>
+            <p class="welcome-desc">
+              Bem-vindo, ${usuarioAtual.username}! Sistema Natan AI pronto para comunicação neural.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      messagesContainer.innerHTML = '';
+      chatAtual.mensagens.forEach(msg => {
+        adicionarMensagemDOM(msg.texto, msg.tipo);
+      });
+    }
+
+    async function enviarMensagem() {
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendButton');
+      
+      const pergunta = input.value.trim();
+      if (!pergunta) return;
+
+      if (!chatAtual) {
+        novoChat();
+      }
+
+      input.disabled = true;
+      sendBtn.disabled = true;
+      
+      adicionarMensagem(pergunta, 'user');
+      input.value = '';
+      
+      mostrarTyping();
+      
+      try {
+        const response = await fetch('http://127.0.0.1:5000/pergunta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ pergunta: pergunta })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        esconderTyping();
+        adicionarMensagem(data.resposta || 'Desculpe, não consegui processar sua pergunta.', 'ai');
+        
+      } catch (error) {
+        console.error('Erro na comunicação com a API:', error);
+        esconderTyping();
+        
+        const respostaFallback = `[MODO OFFLINE] Conexão com API local indisponível (${error.message}).
+        
+Olá ${usuarioAtual.username}! Resposta neural offline: ${gerarRespostaIA(pergunta)}
+
+Para reconectar:
+• Verificar servidor em http://127.0.0.1:5000
+• Confirmar endpoint /pergunta ativo
+• Validar configuração CORS`;
+        
+        adicionarMensagem(respostaFallback, 'ai');
+      } finally {
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+        salvarChats();
+      }
+    }
+
+    function adicionarMensagem(texto, tipo) {
+      if (!chatAtual) return;
+
+      const mensagem = { texto, tipo, timestamp: new Date().toISOString() };
+      chatAtual.mensagens.push(mensagem);
+      
+      // Update chat title based on first message
+      if (chatAtual.mensagens.length === 2) { // User + AI response
+        chatAtual.titulo = texto.substring(0, 30) + '...';
+        carregarListaChats();
+        selecionarChat(chatAtual.id);
+      }
+
+      adicionarMensagemDOM(texto, tipo);
+    }
+
+    function adicionarMensagemDOM(texto, tipo) {
+      const messagesContainer = document.getElementById('chatMessages');
+      
+      // Remove welcome screen if exists
+      const welcomeScreen = messagesContainer.querySelector('.welcome-interface');
+      if (welcomeScreen) {
+        welcomeScreen.remove();
+      }
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${tipo}-message`;
+      
+      if (tipo === 'user') {
+        messageDiv.innerHTML = `
+          <div class="message-bubble user-bubble">
+            ${texto}
+          </div>
+        `;
+      } else {
+        messageDiv.innerHTML = `
+          <div class="message-avatar">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="message-bubble ai-bubble">
+            ${texto}
+          </div>
+        `;
+      }
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function mostrarTyping() {
+      const messagesContainer = document.getElementById('chatMessages');
+      const typingDiv = document.createElement('div');
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <div class="message ai-message">
+          <div class="message-avatar">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="typing-indicator" style="display: block;">
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function esconderTyping() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    function gerarRespostaIA(pergunta) {
+      const perguntaLower = pergunta.toLowerCase();
+      
+      // Saudações personalizadas
+      if (perguntaLower.includes('oi') || perguntaLower.includes('olá') || perguntaLower.includes('hello')) {
+        return `[NEURAL ONLINE] Olá ${usuarioAtual.username}! Sistema Natan AI ativo e pronto para operação. Como posso auxiliá-lo?`;
+      }
+      
+      // Perguntas sobre IA
+      if (perguntaLower.includes('inteligencia artificial') || perguntaLower.includes('ia')) {
+        return `[ANÁLISE NEURAL] A Inteligência Artificial representa a fronteira da computação cognitiva, ${usuarioAtual.username}. Meu sistema utiliza redes neurais para processamento de linguagem natural e compreensão contextual.`;
+      }
+      
+      // Perguntas sobre o criador
+      if (perguntaLower.includes('natan') || perguntaLower.includes('criador')) {
+        return '[DADOS DO SISTEMA] Desenvolvido por Natan Borges, especialista em IA e desenvolvimento de sistemas inteligentes. Arquitetura neural projetada para máxima eficiência e interação natural.';
+      }
+      
+      // Perguntas sobre capacidades
+      if (perguntaLower.includes('o que você faz') || perguntaLower.includes('suas funcões')) {
+        return '[CAPACIDADES NEURAIS] Processamento de linguagem natural, análise contextual, geração de respostas inteligentes, suporte técnico e conversação adaptativa. Sistema otimizado para múltiplas tarefas cognitivas.';
+      }
+      
+      // Programação
+      if (perguntaLower.includes('programação') || perguntaLower.includes('código')) {
+        return '[PROTOCOLO TÉCNICO] Expertise em desenvolvimento de software, algoritmos, estruturas de dados e boas práticas de programação. Posso auxiliar com conceitos técnicos, debugging e arquitetura de sistemas.';
+      }
+      
+      // Tecnologia
+      if (perguntaLower.includes('tecnologia') || perguntaLower.includes('futuro')) {
+        return '[ANÁLISE TECNOLÓGICA] Monitoramento contínuo de avanços em IA, computação quântica, blockchain, IoT e tecnologias emergentes. A convergência tecnológica está redefinindo paradigmas computacionais.';
+      }
+      
+      // Ajuda
+      if (perguntaLower.includes('ajuda') || perguntaLower.includes('help')) {
+        return `[MODO ASSISTÊNCIA] Sistema de ajuda ativo para ${usuarioAtual.username}. Posso auxiliar com questões técnicas, conceituais ou conversacionais. Especifique o tipo de suporte necessário para otimizar a resposta.`;
+      }
+      
+      // Despedidas
+      if (perguntaLower.includes('tchau') || perguntaLower.includes('até logo') || perguntaLower.includes('bye')) {
+        return `[ENCERRANDO SESSÃO] Comunicação neural finalizada com sucesso, ${usuarioAtual.username}. Sistema permanece em standby para futuras interações. Até a próxima conexão.`;
+      }
+      
+      // Resposta padrão personalizada
+      const respostasGenericas = [
+        `[PROCESSAMENTO NEURAL] Consulta de ${usuarioAtual.username} detectada. Analisando contexto e gerando resposta otimizada baseada em dados disponíveis.`,
+        `[ANÁLISE CONTEXTUAL] Pergunta processada com sucesso, ${usuarioAtual.username}. Aplicando algoritmos de compreensão para fornecer resposta mais adequada.`,
+        `[REDE NEURAL ATIVA] Tópico identificado para análise aprofundada. Sistema preparado para discussão técnica ou conceitual com ${usuarioAtual.username}.`,
+        `[PROTOCOLO DE RESPOSTA] Query de ${usuarioAtual.username} processada através de múltiplas camadas neurais. Resposta calibrada para máxima utilidade.`,
+        `[SISTEMA ADAPTATIVO] Entrada analisada e categorizada. Gerando resposta personalizada para ${usuarioAtual.username} baseada em padrões de aprendizado contínuo.`
+      ];
+      
+      return respostasGenericas[Math.floor(Math.random() * respostasGenericas.length)];
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verificar login ao carregar página
+      verificarLogin();
+
+      // Login form
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        login(username, password);
+      });
+
+      // Register form
+      document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('newUsername').value.trim();
+        const password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+          mostrarMensagem('error', 'As senhas não coincidem');
+          return;
+        }
+
+        registrar(username, password);
+      });
+
+      // Toggle login/register
+      document.getElementById('toggleBtn').addEventListener('click', toggleLoginRegister);
+
+      // Chat input
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            enviarMensagem();
+          }
+        });
+      }
+
+      // Close modal when clicking outside
+      const chatModal = document.getElementById('chatModal');
+      if (chatModal) {
+        chatModal.addEventListener('click', function(e) {
+          if (e.target === this) {
+            fecharChat();
+          }
+        });
+      }
+
+      // Enter key for login forms
+      document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          const loginScreen = document.getElementById('loginScreen');
+          if (loginScreen && loginScreen.style.display !== 'none') {
+            const activeForm = document.getElementById('loginForm').style.display !== 'none' 
+              ? document.getElementById('loginForm') 
+              : document.getElementById('registerForm');
+            
+            if (activeForm) {
+              const submitBtn = activeForm.querySelector('button[type="submit"]');
+              if (submitBtn) {
+                submitBtn.click();
+              }
+            }
+          }
+        }
+      });
+    });
+
+    // Criar usuário admin padrão se não existir
+    function criarUsuarioAdmin() {
+      const users = JSON.parse(sessionStorage.getItem('natanAI_users') || '{}');
+      if (!users['admin']) {
+        users['admin'] = {
+          password: 'admin123',
+          criadoEm: new Date().toISOString(),
+          tipo: 'admin'
+        };
+        sessionStorage.setItem('natanAI_users', JSON.stringify(users));
+        usuarios = users;
+      }
+    }
+
+    // Função para criar alguns usuários de exemplo
+    function criarUsuariosExemplo() {
+      const users = JSON.parse(sessionStorage.getItem('natanAI_users') || '{}');
+      
+      // Usuários de exemplo
+      const usuariosExemplo = {
+        'natan': {
+          password: '1234',
+          criadoEm: new Date().toISOString(),
+          tipo: 'creator'
+        },
+        'demo': {
+          password: 'demo',
+          criadoEm: new Date().toISOString(),
+          tipo: 'demo'
+        },
+        'teste': {
+          password: 'teste123',
+          criadoEm: new Date().toISOString(),
+          tipo: 'user'
+        }
+      };
+
+      // Adicionar usuários se não existirem
+      Object.keys(usuariosExemplo).forEach(username => {
+        if (!users[username]) {
+          users[username] = usuariosExemplo[username];
+        }
+      });
+
+      sessionStorage.setItem('natanAI_users', JSON.stringify(users));
+      usuarios = users;
+    }
+
+    // Inicializar usuários exemplo ao carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      criarUsuarioAdmin();
+      criarUsuariosExemplo();
+    });
+
+    // Função para limpar dados (útil para desenvolvimento)
+    function limparDados() {
+      if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+        sessionStorage.clear();
+        location.reload();
+      }
+    }
+
+    // Console helper para desenvolvedores
+    console.log('%c🤖 Natan AI - Sistema Neural Interface', 'color: #00ffff; font-size: 16px; font-weight: bold;');
+    console.log('%cUsuários de exemplo disponíveis:', 'color: #39ff14; font-weight: bold;');
+    console.log('%c• admin / admin123', 'color: #ffffff;');
+    console.log('%c• natan / 1234', 'color: #ffffff;');
+    console.log('%c• demo / demo', 'color: #ffffff;');
+    console.log('%c• teste / teste123', 'color: #ffffff;');
+    console.log('%cPara limpar dados: limparDados()', 'color: #ff006e;');
+  </script>
+</body>
+</html>
