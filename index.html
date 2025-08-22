@@ -1349,15 +1349,14 @@
             sendButton.disabled = true;
             
             try {
-                // Call AI API
-                const response = await fetch('https://api-l-menai-kjmf.onrender.com', {
+                // Call AI API - using the same pattern as the quiz
+                const response = await fetch('https://api-l-menai-kjmf.onrender.com/pergunta', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: message,
-                        conversation_history: chat.messages.slice(-10) // Last 10 messages for context
+                        pergunta: message
                     })
                 });
                 
@@ -1366,7 +1365,7 @@
                 }
                 
                 const data = await response.json();
-                const aiResponse = data.response || 'Desculpe, não consegui processar sua solicitação.';
+                const aiResponse = data.resposta || 'Desculpe, não consegui processar sua solicitação.';
                 
                 // Add AI response
                 chat.messages.push({
