@@ -200,6 +200,7 @@
             margin-bottom: 6px;
             transition: all 0.2s ease;
             border: 1px solid transparent;
+            position: relative;
         }
 
         .chat-item:hover {
@@ -301,6 +302,14 @@
             color: white;
             font-weight: 600;
             font-size: 14px;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         /* Chat Area */
@@ -350,11 +359,19 @@
             font-weight: 600;
             font-size: 14px;
             flex-shrink: 0;
+            overflow: hidden;
         }
 
         .message.user .message-avatar {
             background: var(--blue-500);
             color: white;
+        }
+
+        .message.user .message-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .message.ai .message-avatar {
@@ -840,7 +857,10 @@
                         </svg>
                     </button>
                     <div class="user-profile" onclick="logout()">
-                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-avatar" id="userAvatar">
+                            <img id="userAvatarImg" style="display: none;" />
+                            <span id="userAvatarText">U</span>
+                        </div>
                         <span id="userName">Usuário</span>
                     </div>
                 </div>
@@ -1049,6 +1069,11 @@
         let sessionStartTime = Date.now();
         let isTyping = false;
 
+        // User-specific storage keys
+        function getUserKey(key) {
+            return `natanai_${key}_${currentUser ? currentUser.id : 'default'}`;
+        }
+
         // Initialize App
         function initializeApp() {
             loadSettings();
@@ -1078,6 +1103,8 @@
                     picture: payload.picture
                 };
                 
+                console.log('Login realizado para:', currentUser.name, '| ID:', currentUser.id);
+                
                 settings.userName = payload.name;
                 saveSettings();
                 updateUserProfile();
@@ -1099,20 +1126,45 @@
                 currentUser = null;
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
+                
+                // Reset all data
+                chats = {};
+                settings = {
+                    theme: 'light',
+                    userName: '',
+                    typingSound: true,
+                    sendSound: true,
+                    deleteSound: true,
+                    notifications: false,
+                    autoRestore: true
+                };
             }
         }
 
         function updateUserProfile() {
             if (currentUser) {
                 document.getElementById('userName').textContent = currentUser.name || 'Usuário';
-                document.getElementById('userAvatar').textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
                 document.getElementById('userNameInput').value = settings.userName;
+                
+                // Update avatar
+                const userAvatarImg = document.getElementById('userAvatarImg');
+                const userAvatarText = document.getElementById('userAvatarText');
+                
+                if (currentUser.picture) {
+                    userAvatarImg.src = currentUser.picture;
+                    userAvatarImg.style.display = 'block';
+                    userAvatarText.style.display = 'none';
+                } else {
+                    userAvatarImg.style.display = 'none';
+                    userAvatarText.style.display = 'block';
+                    userAvatarText.textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
+                }
             }
         }
 
         // Settings Management
         function loadSettings() {
-            const savedSettings = JSON.parse(localStorage.getItem('natanai_settings') || '{}');
+            const savedSettings = JSON.parse(localStorage.getItem(getUserKey('settings')) || '{}');
             settings = { ...settings, ...savedSettings };
             
             // Apply theme
@@ -1130,7 +1182,7 @@
         }
 
         function saveSettings() {
-            localStorage.setItem('natanai_settings', JSON.stringify(settings));
+            localStorage.setItem(getUserKey('settings'), JSON.stringify(settings));
         }
 
         function toggleTheme() {
@@ -1159,12 +1211,14 @@
 
         // Chat Management
         function loadChats() {
-            const savedChats = localStorage.getItem('natanai_chats');
+            const savedChats = localStorage.getItem(getUserKey('chats'));
             chats = savedChats ? JSON.parse(savedChats) : {};
+            console.log('Chats carregados para usuário:', currentUser?.name, '| Quantidade:', Object.keys(chats).length);
         }
 
         function saveChats() {
-            localStorage.setItem('natanai_chats', JSON.stringify(chats));
+            localStorage.setItem(getUserKey('chats'), JSON.stringify(chats));
+            console.log('Chats salvos para usuário:', currentUser?.name, '| Quantidade:', Object.keys(chats).length);
         }
 
         function createNewChat() {
@@ -1262,8 +1316,20 @@
             chat.messages.forEach((message, index) => {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${message.role}`;
+                
+                let avatarContent = '';
+                if (message.role === 'user') {
+                    if (currentUser && currentUser.picture) {
+                        avatarContent = `<img src="${currentUser.picture}" alt="Avatar" />`;
+                    } else {
+                        avatarContent = (currentUser ? currentUser.name.charAt(0) : 'U');
+                    }
+                } else {
+                    avatarContent = 'AI';
+                }
+                
                 messageDiv.innerHTML = `
-                    <div class="message-avatar">${message.role === 'user' ? (currentUser ? currentUser.name.charAt(0) : 'U') : 'AI'}</div>
+                    <div class="message-avatar">${avatarContent}</div>
                     <div class="message-content">
                         <div class="message-bubble">
                             ${message.content}
@@ -1349,7 +1415,7 @@
             sendButton.disabled = true;
             
             try {
-                // Call AI API - using the same pattern as the quiz
+                // Call AI API
                 const response = await fetch('https://api-l-menai-kjmf.onrender.com/pergunta', {
                     method: 'POST',
                     headers: {
@@ -1618,6 +1684,7 @@
 
         function exportData() {
             const data = {
+                user: currentUser,
                 chats,
                 settings,
                 exportDate: new Date().toISOString()
@@ -1627,7 +1694,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `natanai-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `natanai-backup-${currentUser?.name || 'user'}-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1637,7 +1704,11 @@
         function clearAllData() {
             if (confirm('ATENÇÃO: Isso apagará TODOS os seus dados permanentemente. Esta ação não pode ser desfeita!\n\nTem certeza que deseja continuar?')) {
                 if (confirm('Última confirmação: Todos os chats, configurações e dados serão perdidos. Continuar?')) {
-                    localStorage.clear();
+                    // Clear only current user's data
+                    localStorage.removeItem(getUserKey('chats'));
+                    localStorage.removeItem(getUserKey('settings'));
+                    localStorage.removeItem(getUserKey('events'));
+                    
                     chats = {};
                     settings = {
                         theme: 'light',
@@ -1648,7 +1719,10 @@
                         notifications: false,
                         autoRestore: true
                     };
-                    location.reload();
+                    
+                    // Reinitialize app
+                    initializeApp();
+                    alert('Dados limpos com sucesso!');
                 }
             }
         }
@@ -1741,20 +1815,24 @@
         function addMobileMenuButton() {
             if (window.innerWidth <= 768) {
                 const header = document.querySelector('.header');
-                const menuButton = document.createElement('button');
-                menuButton.innerHTML = '☰';
-                menuButton.className = 'mobile-menu-btn';
-                menuButton.style.cssText = `
-                    background: none;
-                    border: none;
-                    font-size: 20px;
-                    cursor: pointer;
-                    padding: 8px;
-                    margin-right: 16px;
-                    color: var(--text-primary);
-                `;
-                menuButton.onclick = toggleSidebar;
-                header.insertBefore(menuButton, header.firstChild);
+                const existingBtn = header.querySelector('.mobile-menu-btn');
+                
+                if (!existingBtn) {
+                    const menuButton = document.createElement('button');
+                    menuButton.innerHTML = '☰';
+                    menuButton.className = 'mobile-menu-btn';
+                    menuButton.style.cssText = `
+                        background: none;
+                        border: none;
+                        font-size: 20px;
+                        cursor: pointer;
+                        padding: 8px;
+                        margin-right: 16px;
+                        color: var(--text-primary);
+                    `;
+                    menuButton.onclick = toggleSidebar;
+                    header.insertBefore(menuButton, header.firstChild);
+                }
             }
         }
 
@@ -1861,25 +1939,26 @@
             }
         });
 
-        // Analytics and usage tracking (basic)
+        // Analytics and usage tracking (basic) - per user
         function trackEvent(eventName, eventData = {}) {
             const event = {
                 name: eventName,
                 data: eventData,
                 timestamp: new Date().toISOString(),
-                sessionId: sessionStartTime
+                sessionId: sessionStartTime,
+                userId: currentUser?.id
             };
             
-            // Store events locally (could be sent to analytics service)
-            const events = JSON.parse(localStorage.getItem('natanai_events') || '[]');
+            // Store events locally per user
+            const events = JSON.parse(localStorage.getItem(getUserKey('events')) || '[]');
             events.push(event);
             
-            // Keep only last 100 events
+            // Keep only last 100 events per user
             if (events.length > 100) {
                 events.splice(0, events.length - 100);
             }
             
-            localStorage.setItem('natanai_events', JSON.stringify(events));
+            localStorage.setItem(getUserKey('events'), JSON.stringify(events));
         }
 
         // Track important events
@@ -1961,9 +2040,10 @@
         // Call cleanup on page unload
         window.addEventListener('beforeunload', cleanup);
 
-        console.log('🤖 NatanAI Dashboard carregado com sucesso!');
-        console.log('📱 Versão: 1.0.0');
-        console.log('🚀 Recursos: Chat IA, Dashboard, Histórico, Configurações');
+        console.log('🤖 NatanAI Dashboard Multi-usuário carregado com sucesso!');
+        console.log('📱 Versão: 2.0.0');
+        console.log('🚀 Recursos: Chat IA com dados separados por usuário, Dashboard, Histórico, Configurações');
+        console.log('👤 Sistema multi-usuário ativo - dados isolados por ID do Google');
     </script>
 </body>
 </html>
