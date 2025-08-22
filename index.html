@@ -78,6 +78,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            z-index: 1001;
         }
 
         .sidebar::before {
@@ -90,10 +91,18 @@
             background: var(--gradient-blue);
         }
 
-        .logo {
-            padding: 24px;
-            text-align: center;
+        /* Cabeçalho da sidebar com botão X no mobile */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 16px 24px;
             border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            text-align: center;
+            flex: 1;
         }
 
         .logo h1 {
@@ -113,6 +122,27 @@
             letter-spacing: 1px;
         }
 
+        .sidebar-close-btn {
+            display: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .sidebar-close-btn:hover {
+            background: var(--blue-500);
+            color: white;
+        }
+
         /* Navegação */
         .nav-menu {
             flex: 1;
@@ -123,11 +153,12 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 12px 24px;
+            padding: 14px 24px;
             cursor: pointer;
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
             margin: 2px 0;
+            font-size: 15px;
         }
 
         .nav-item:hover {
@@ -147,8 +178,8 @@
         }
 
         .nav-icon {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             margin-right: 12px;
             fill: currentColor;
         }
@@ -161,7 +192,7 @@
 
         .chat-list-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
         }
@@ -171,7 +202,6 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
         }
 
         .new-chat-btn {
@@ -194,10 +224,10 @@
         }
 
         .chat-item {
-            padding: 10px 12px;
+            padding: 12px 14px;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             transition: all 0.2s ease;
             border: 1px solid transparent;
             position: relative;
@@ -254,11 +284,34 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            margin-right: 12px;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--blue-500);
+            color: white;
         }
 
         .header-title {
             font-size: 18px;
             font-weight: 600;
+            flex: 1;
         }
 
         .header-actions {
@@ -312,6 +365,25 @@
             object-fit: cover;
         }
 
+        /* Debug Info - Reposicionado no topo */
+        .user-debug {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            color: var(--text-muted);
+            z-index: 9999;
+            max-width: 200px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            opacity: 0.9;
+            font-family: monospace;
+        }
+
         /* Chat Area */
         .chat-area {
             flex: 1;
@@ -322,15 +394,15 @@
 
         .chat-messages {
             flex: 1;
-            padding: 20px;
+            padding: 16px;
             overflow-y: auto;
             scroll-behavior: smooth;
         }
 
         .message {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             animation: slideIn 0.3s ease;
         }
 
@@ -350,14 +422,14 @@
         }
 
         .message-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             flex-shrink: 0;
             overflow: hidden;
         }
@@ -381,7 +453,7 @@
 
         .message-content {
             flex: 1;
-            max-width: 70%;
+            max-width: 75%;
         }
 
         .message-bubble {
@@ -430,14 +502,14 @@
 
         /* Chat Input */
         .chat-input {
-            padding: 20px;
+            padding: 16px;
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
         }
 
         .input-container {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-end;
             max-width: 100%;
         }
@@ -492,7 +564,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 12px 16px;
             background: var(--bg-tertiary);
             border-top: 1px solid var(--border-color);
             font-size: 12px;
@@ -516,22 +588,22 @@
 
         /* Dashboard Cards */
         .dashboard-content {
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: var(--shadow);
             transition: all 0.2s ease;
         }
@@ -563,7 +635,7 @@
 
         /* Settings */
         .settings-content {
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
         }
 
@@ -571,7 +643,7 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             overflow: hidden;
         }
 
@@ -704,65 +776,6 @@
             }
         }
 
-        /* User Info Debug */
-        .user-debug {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            color: var(--text-muted);
-            z-index: 1000;
-            max-width: 250px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                z-index: 1000;
-                height: 100vh;
-            }
-
-            .sidebar.open {
-                left: 0;
-            }
-
-            .main-content {
-                width: 100%;
-            }
-
-            .message-content {
-                max-width: 85%;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-tertiary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--blue-500);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--blue-600);
-        }
-
         /* Utilities */
         .hidden {
             display: none !important;
@@ -787,16 +800,298 @@
             margin-bottom: 8px;
             color: var(--text-secondary);
         }
+
+        /* Overlay para mobile quando sidebar está aberta */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Responsive - Mobile */
+        @media (max-width: 768px) {
+            /* Header mobile */
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header-title {
+                font-size: 16px;
+                margin-left: 8px;
+            }
+
+            .user-profile span {
+                display: none;
+            }
+
+            .theme-toggle {
+                padding: 6px;
+            }
+
+            /* Sidebar mobile */
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 1001;
+                height: 100vh;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .sidebar-close-btn {
+                display: flex;
+            }
+
+            .sidebar-header {
+                padding: 16px 20px;
+            }
+
+            .logo h1 {
+                font-size: 24px;
+            }
+
+            /* Main content mobile */
+            .main-content {
+                width: 100%;
+            }
+
+            /* Messages mobile */
+            .chat-messages {
+                padding: 12px;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .message-bubble {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+
+            /* Input mobile */
+            .chat-input {
+                padding: 12px;
+            }
+
+            .input-container {
+                gap: 8px;
+            }
+
+            .message-input {
+                padding: 10px 14px;
+                font-size: 16px; /* Previne zoom no iOS */
+            }
+
+            .send-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            /* Token counter mobile */
+            .token-counter {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+
+            /* Dashboard mobile */
+            .dashboard-content,
+            .settings-content {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            /* Settings mobile */
+            .settings-item {
+                padding: 14px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .settings-item > div:first-child {
+                flex: 1;
+                width: 100%;
+            }
+
+            /* Debug info mobile */
+            .user-debug {
+                top: 4px;
+                right: 4px;
+                font-size: 8px;
+                padding: 4px 6px;
+                max-width: 140px;
+            }
+
+            /* Chat list mobile */
+            .chat-list {
+                padding: 16px;
+            }
+
+            .chat-item {
+                padding: 10px 12px;
+            }
+
+            /* Login mobile */
+            .login-card {
+                padding: 32px 24px;
+                margin: 20px;
+            }
+
+            .login-logo {
+                font-size: 36px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 12px;
+            }
+
+            .chat-messages {
+                padding: 8px;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            .dashboard-content,
+            .settings-content {
+                padding: 12px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .user-debug {
+                font-size: 7px;
+                padding: 3px 5px;
+                max-width: 120px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .chat-messages {
+                padding: 8px 12px;
+            }
+
+            .message {
+                margin-bottom: 12px;
+            }
+
+            .empty-state {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Scrollbar customizado */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--blue-500);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--blue-600);
+        }
+
+        /* Mobile scrollbar */
+        @media (max-width: 768px) {
+            ::-webkit-scrollbar {
+                width: 3px;
+            }
+        }
+
+        /* Smooth transitions para mobile */
+        @media (max-width: 768px) {
+            * {
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            button, .nav-item, .chat-item {
+                touch-action: manipulation;
+            }
+        }
+
+        /* Safe area para iPhones com notch */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            @media (max-width: 768px) {
+                .header {
+                    padding-top: max(12px, env(safe-area-inset-top));
+                }
+
+                .sidebar {
+                    padding-top: env(safe-area-inset-top);
+                }
+
+                .sidebar-header {
+                    padding-top: max(16px, calc(env(safe-area-inset-top) + 8px));
+                }
+
+                .chat-input {
+                    padding-bottom: max(16px, env(safe-area-inset-bottom));
+                }
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- User Debug Info (removível em produção) -->
+    <!-- Debug Info - Reposicionado no topo -->
     <div id="userDebug" class="user-debug hidden">
-        <strong>Debug Info:</strong><br>
-        Usuário: <span id="debugUser">-</span><br>
-        ID: <span id="debugId">-</span><br>
-        Chats: <span id="debugChats">0</span>
+        <div><strong>Debug:</strong></div>
+        <div>User: <span id="debugUser">-</span></div>
+        <div>ID: <span id="debugId">-</span></div>
+        <div>Chats: <span id="debugChats">0</span></div>
     </div>
+
+    <!-- Overlay para mobile -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
 
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
@@ -828,9 +1123,12 @@
     <div id="appContainer" class="app-container hidden">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">
-                <h1>NatanAI</h1>
-                <p>Inteligência Artificial</p>
+            <div class="sidebar-header">
+                <div class="logo">
+                    <h1>NatanAI</h1>
+                    <p>Inteligência Artificial</p>
+                </div>
+                <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
             </div>
 
             <nav class="nav-menu">
@@ -875,6 +1173,7 @@
         <main class="main-content">
             <!-- Header -->
             <header class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
                 <h2 id="pageTitle" class="header-title">Chat com NatanAI</h2>
                 <div class="header-actions">
                     <button class="theme-toggle" onclick="toggleTheme()">
@@ -1095,6 +1394,23 @@
         let sessionStartTime = Date.now();
         let isTyping = false;
 
+        // Mobile sidebar functions
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
         // CORREÇÃO CRÍTICA: Sistema de chaves único por usuário
         function getUserKey(key) {
             if (!currentUser || !currentUser.id) {
@@ -1205,6 +1521,9 @@
                 saveChats();
                 saveSettings();
                 
+                // Fechar sidebar se estiver aberta no mobile
+                closeSidebar();
+                
                 // Limpar sessão atual
                 clearUserSession();
                 
@@ -1279,6 +1598,7 @@
             document.documentElement.setAttribute('data-theme', settings.theme);
             document.getElementById('themeToggle').classList.toggle('active');
             saveSettings();
+            updateThemeColor();
         }
 
         function toggleSetting(settingKey) {
@@ -1343,6 +1663,11 @@
             renderChatList();
             playSound('send');
             
+            // Fechar sidebar no mobile após criar chat
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+            
             console.log('✨ Nova conversa criada:', chatId, 'para usuário:', currentUser?.name);
         }
 
@@ -1356,6 +1681,11 @@
             
             // Update chat name in header
             document.getElementById('pageTitle').textContent = chats[chatId].name;
+            
+            // Fechar sidebar no mobile ao selecionar chat
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
             
             console.log('🎯 Chat selecionado:', chatId, 'Usuário:', currentUser?.name);
         }
@@ -1514,6 +1844,7 @@
             }
             
             input.value = '';
+            input.style.height = 'auto';
             saveChats();
             renderChatMessages();
             renderChatList();
@@ -1680,6 +2011,11 @@
                 settings: 'Configurações'
             };
             document.getElementById('pageTitle').textContent = titles[page];
+            
+            // Fechar sidebar no mobile ao trocar de página
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
             
             if (page === 'dashboard') {
                 updateStats();
@@ -1958,6 +2294,25 @@
                 }
             });
 
+            // Close sidebar on outside click (mobile)
+            document.addEventListener('click', (e) => {
+                const sidebar = document.querySelector('.sidebar');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                
+                if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                    if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        closeSidebar();
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+
             // Update stats periodically
             setInterval(() => {
                 if (currentUser) {
@@ -1966,116 +2321,57 @@
             }, 30000); // Every 30 seconds
         }
 
-        // Mobile responsiveness
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Add mobile menu button for small screens
-        function addMobileMenuButton() {
-            if (window.innerWidth <= 768) {
-                const header = document.querySelector('.header');
-                const existingBtn = header.querySelector('.mobile-menu-btn');
-                
-                if (!existingBtn) {
-                    const menuButton = document.createElement('button');
-                    menuButton.innerHTML = '☰';
-                    menuButton.className = 'mobile-menu-btn';
-                    menuButton.style.cssText = `
-                        background: none;
-                        border: none;
-                        font-size: 20px;
-                        cursor: pointer;
-                        padding: 8px;
-                        margin-right: 16px;
-                        color: var(--text-primary);
-                    `;
-                    menuButton.onclick = toggleSidebar;
-                    header.insertBefore(menuButton, header.firstChild);
-                }
-            }
-        }
-
-        // Initialize mobile features
-        window.addEventListener('resize', () => {
-            addMobileMenuButton();
-        });
-
-        // Performance optimizations
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
+        // Analytics and usage tracking (basic) - CORRIGIDO para isolamento por usuário
+        function trackEvent(eventName, eventData = {}) {
+            if (!currentUser) return;
+            
+            const event = {
+                name: eventName,
+                data: eventData,
+                timestamp: new Date().toISOString(),
+                sessionId: sessionStartTime,
+                userId: currentUser.id,
+                userName: currentUser.name
             };
+            
+            // Store events locally per user
+            const userKey = getUserKey('events');
+            const events = JSON.parse(localStorage.getItem(userKey) || '[]');
+            events.push(event);
+            
+            // Keep only last 100 events per user
+            if (events.length > 100) {
+                events.splice(0, events.length - 100);
+            }
+            
+            localStorage.setItem(userKey, JSON.stringify(events));
+            console.log('📈 Evento rastreado:', eventName, 'Usuário:', currentUser.name);
         }
 
-        // Optimize scroll performance
-        const optimizedScrollHandler = debounce(() => {
-            // Handle scroll events here if needed
-        }, 16); // ~60fps
+        // Track important events
+        const originalSendMessageTracked = sendMessage;
+        const originalCreateNewChatTracked = createNewChat;
+        const originalSwitchPageTracked = switchPage;
 
-        document.addEventListener('scroll', optimizedScrollHandler);
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Ctrl/Cmd + N: New chat
-            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-                e.preventDefault();
-                if (currentUser) createNewChat();
+        // Theme color update based on current theme
+        function updateThemeColor() {
+            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            if (!metaThemeColor) {
+                const meta = document.createElement('meta');
+                meta.name = 'theme-color';
+                document.head.appendChild(meta);
             }
             
-            // Ctrl/Cmd + /: Focus message input
-            if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-                e.preventDefault();
-                document.getElementById('messageInput').focus();
-            }
-            
-            // Ctrl/Cmd + 1-4: Switch pages
-            if ((e.ctrlKey || e.metaKey) && ['1', '2', '3', '4'].includes(e.key)) {
-                e.preventDefault();
-                const pages = ['chat', 'dashboard', 'history', 'settings'];
-                switchPage(pages[parseInt(e.key) - 1]);
-            }
-        });
-
-        // Error handling
-        window.addEventListener('error', (e) => {
-            console.error('❌ Global error:', e.error);
-            
-            // Show user-friendly error message
-            const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #dc2626;
-                color: white;
-                padding: 12px 16px;
-                border-radius: 8px;
-                z-index: 10000;
-                font-size: 14px;
-                max-width: 300px;
-            `;
-            errorDiv.textContent = 'Ocorreu um erro. Tente recarregar a página.';
-            document.body.appendChild(errorDiv);
-            
-            setTimeout(() => {
-                if (document.body.contains(errorDiv)) {
-                    document.body.removeChild(errorDiv);
-                }
-            }, 5000);
-        });
+            const themeColor = settings.theme === 'dark' ? '#0f172a' : '#ffffff';
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
+        }
 
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            addMobileMenuButton();
-            console.log('🚀 NatanAI Dashboard carregado - Sistema Multi-usuário CORRIGIDO');
+            console.log('🚀 NatanAI Dashboard Mobile Otimizado carregado - Sistema Multi-usuário');
+            
+            // Initialize theme color
+            updateThemeColor();
             
             // DESENVOLVIMENTO: Auto-login apenas em localhost
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -2109,93 +2405,22 @@
             }
         });
 
-        // Analytics and usage tracking (basic) - CORRIGIDO para isolamento por usuário
-        function trackEvent(eventName, eventData = {}) {
-            if (!currentUser) return;
-            
-            const event = {
-                name: eventName,
-                data: eventData,
-                timestamp: new Date().toISOString(),
-                sessionId: sessionStartTime,
-                userId: currentUser.id,
-                userName: currentUser.name
-            };
-            
-            // Store events locally per user
-            const userKey = getUserKey('events');
-            const events = JSON.parse(localStorage.getItem(userKey) || '[]');
-            events.push(event);
-            
-            // Keep only last 100 events per user
-            if (events.length > 100) {
-                events.splice(0, events.length - 100);
-            }
-            
-            localStorage.setItem(userKey, JSON.stringify(events));
-            console.log('📈 Evento rastreado:', eventName, 'Usuário:', currentUser.name);
-        }
-
-        // Track important events
-        const originalSendMessage = sendMessage;
-        sendMessage = function() {
-            trackEvent('message_sent', { chatId: currentChatId });
-            return originalSendMessage.apply(this, arguments);
-        };
-
-        const originalCreateNewChat = createNewChat;
-        createNewChat = function() {
-            trackEvent('chat_created');
-            return originalCreateNewChat.apply(this, arguments);
-        };
-
-        const originalSwitchPage = switchPage;
-        switchPage = function(page) {
-            trackEvent('page_viewed', { page });
-            return originalSwitchPage.apply(this, arguments);
-        };
-
-        // Theme color update based on current theme
-        function updateThemeColor() {
-            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-            if (!metaThemeColor) {
-                const meta = document.createElement('meta');
-                meta.name = 'theme-color';
-                document.head.appendChild(meta);
-            }
-            
-            const themeColor = settings.theme === 'dark' ? '#0f172a' : '#ffffff';
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
-        }
-
-        // Call theme color update when theme changes
-        const originalToggleTheme = toggleTheme;
-        toggleTheme = function() {
-            originalToggleTheme();
-            updateThemeColor();
-        };
-
-        // Initialize theme color
-        updateThemeColor();
-
         // Cleanup function for memory management
         function cleanup() {
             // Clear intervals and timeouts
             clearInterval(window.statsInterval);
             clearInterval(window.tokenRestoreInterval);
-            
-            // Remove event listeners
-            document.removeEventListener('scroll', optimizedScrollHandler);
         }
 
         // Call cleanup on page unload
         window.addEventListener('beforeunload', cleanup);
 
-        console.log('🤖 NatanAI Dashboard Multi-usuário CORRIGIDO carregado com sucesso!');
-        console.log('📱 Versão: 2.1.0 - ISOLAMENTO DE DADOS CORRIGIDO');
+        console.log('🤖 NatanAI Dashboard Mobile Otimizado carregado com sucesso!');
+        console.log('📱 Versão: 2.2.0 - MOBILE OTIMIZADO');
         console.log('🚀 Recursos: Chat IA, Dashboard, Histórico, Configurações');
+        console.log('📱 Mobile: Sidebar com X, overlay, espaçamento otimizado');
+        console.log('🔝 Debug Info reposicionado no topo');
         console.log('🔒 Sistema multi-usuário: Dados 100% isolados por ID do Google');
-        console.log('🛡️ Chaves de localStorage únicas por usuário garantidas');
     </script>
 </body>
 </html>
